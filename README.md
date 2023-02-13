@@ -1,35 +1,91 @@
-# `tsmodule` library
+# `yield-stream`
 
-This is a [`tsmodule`](https://github.com/tsmodule/tsmodule) library. By
-default, it is assumed to be a Node program, but this can be adjusted via the
-`platform` field in package.json.
+A small library for switching between streams, generators, and arrays.
 
-### Develop
 
-Rebuild on changes with `tsmodule dev` or the `yarn dev` script:
+```ts
+import { GeneratorFn, StreamGenerator } from "./types";
 
-```bash
-yarn dev
-# calls `tsmodule dev`
+/**
+ * `compose(f, g, h, ...)` returns a generator function `G(data)` that yields
+ * all `(f · g · h · ...)(data)`.
+ */
+export const compose = <T>(
+  ...generators: GeneratorFn<T>[]
+) => {
+  return generators.reduce(
+    (prev, next) => async function* (data) {
+      for await (const chunk of prev(data)) {
+        yield* next(chunk);
+      }
+    },
+  );
+};
+
+/**
+ * Runs each chunk through all of the given transforms.
+ */
+export const pipeline = <T>(
+  stream: ReadableStream<T>,
+  ...transforms: GeneratorFn<T>[]
+) => {
+  const composed = compose(...transforms);
+  return generateStream(
+    async function* () {
+      for await (const chunk of yieldStream(stream)) {
+        yield* composed(chunk);
+      }
+    }
+  );
+};
+
+/**
+ * Iterates over a stream, yielding each chunk.
+ */
+export const yieldStream = async function* <T>(
+  stream: ReadableStream<T>,
+  controller?: AbortController
+) {
+  const reader = stream.getReader();
+  while (true) {
+    if (controller?.signal.aborted) {
+      break;
+    }
+
+    const { done, value } = await reader.read();
+    if (done) {
+      break;
+    }
+
+    yield value;
+  }
+};
+
+/**
+ * Creates a ReadableStream from a generator function.
+ */
+export const generateStream = <T, TReturn, D>(
+  G: StreamGenerator<D, T, TReturn>,
+  data?: D
+) => {
+  return new ReadableStream<T>({
+    async start(controller) {
+      for await (const chunk of G(data)) {
+        controller.enqueue(chunk);
+      }
+      controller.close();
+    },
+  });
+};
+
+/**
+ * Creates a ReadableStream that yields all values in an array.
+ */
+export const streamArray = <T>(array: T[]) => {
+  return generateStream(function* () {
+    for (const item of array) {
+      yield item;
+    }
+  });
+};
 ```
-
-### Export and publish
-
-To export your component library, use `tsmodule build` or the `yarn build`
-script:
-
-```bash
-yarn build
-# calls `tsmodule build`
-```
-
-You can then publish to NPM:
-
-```bash
-yarn publish
-```
-
-#### Importing from your library
-
-All index exports, e.g. `src/example/index.tsx` will be available downstream
-via `import ... from "my-library/example"`.
