@@ -3,7 +3,7 @@
  * same type.
  */
 export type GeneratorFn<T> =
-  (data: T) => Generator<T> | AsyncGenerator<T>;
+  (data?: T) => Generator<T> | AsyncGenerator<T>;
 
 /**
  * A generator function that receives a chunk of data and returns a generator

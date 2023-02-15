@@ -6,7 +6,7 @@ import { GeneratorFn, StreamGenerator } from "./types";
  */
 export const compose = <T>(
   ...generators: GeneratorFn<T>[]
-) => {
+): GeneratorFn<T> => {
   return generators.reduce(
     (prev, next) => async function* (data) {
       for await (const chunk of prev(data)) {
@@ -22,7 +22,7 @@ export const compose = <T>(
 export const pipeline = <T>(
   stream: ReadableStream<T>,
   ...transforms: GeneratorFn<T>[]
-) => {
+): ReadableStream<T> => {
   const composed = compose(...transforms);
   return generateStream(
     async function* () {
@@ -61,7 +61,7 @@ export const yieldStream = async function* <T>(
 export const generateStream = <T, TReturn, D>(
   G: StreamGenerator<D, T, TReturn>,
   data?: D
-) => {
+): ReadableStream<T> => {
   return new ReadableStream<T>({
     async start(controller) {
       for await (const chunk of G(data)) {
@@ -75,12 +75,25 @@ export const generateStream = <T, TReturn, D>(
 /**
  * Creates a ReadableStream that yields all values in an array.
  */
-export const streamArray = <T>(array: T[]) => {
+export const streamArray = <T>(array: T[]): ReadableStream<T> => {
   return generateStream(function* () {
     for (const item of array) {
       yield item;
     }
   });
+};
+
+/**
+ * Generator that accepts a generator `G` and yields an incrementing buffer of
+ * chunks.
+ */
+export const buffer = async function* <T>(stream: ReadableStream<T>) {
+  const buffer: T[] = [];
+
+  for await (const chunk of yieldStream(stream)) {
+    buffer.push(chunk);
+    yield buffer;
+  }
 };
 
 export * from "./types";
