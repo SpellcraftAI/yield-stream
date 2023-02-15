@@ -13,3 +13,6 @@ dist/
 .env.*
 
 yarn-error.log
+
+# generated docs
+public/docs

@@ -18,6 +18,8 @@
   },
   "scripts": {
     "dev": "tsmodule dev",
+    "docs": "typedoc src",
+    "prebuild": "yarn docs",
     "build": "tsmodule build",
     "test": "ava",
     "pretest": "yarn build",
@@ -31,6 +33,7 @@
     "@typescript-eslint/parser": "^5.51.0",
     "ava": "^5.2.0",
     "eslint": "^8.34.0",
+    "typedoc": "^0.23.25",
     "typescript": "^4.9.5"
   },
   "homepage": "https://github.com/gptlabs/yield-stream"

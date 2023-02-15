@@ -1,5 +1,7 @@
 # `yield-stream`
 
+- **Docs: https://yield-stream.vercel.app**
+
 A small library for switching between streams, generators, and arrays.
 
 
