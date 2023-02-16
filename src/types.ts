@@ -17,4 +17,4 @@ export type StreamGenerator<D, T, TReturn> =
  * Composes multiple generator functions into a single generator function.
  * Output type must be the same as input type.
  */
-export type Transform = (chunk: Uint8Array) => AsyncGenerator<Uint8Array>;
+export type Transform = (chunk?: Uint8Array) => AsyncGenerator<Uint8Array>;
