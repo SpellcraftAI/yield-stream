@@ -1,4 +1,4 @@
-import "shim-streams";
+// import "shim-streams";
 import { GeneratorFn, StreamGenerator } from "./types";
 
 /**
