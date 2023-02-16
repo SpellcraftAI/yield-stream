@@ -5,7 +5,7 @@
   "type": "module",
   "platform": "node",
   "engines": {
-    "node": ">=18"
+    "node": ">=14"
   },
   "types": "dist/index.d.ts",
   "files": [
@@ -20,7 +20,7 @@
     "dev": "tsmodule dev",
     "docs": "typedoc src",
     "prebuild": "yarn docs",
-    "build": "tsmodule build",
+    "build": "tsmodule build -b",
     "test": "ava",
     "pretest": "yarn build",
     "prepublishOnly": "yarn test",
@@ -36,5 +36,9 @@
     "typedoc": "^0.23.25",
     "typescript": "^4.9.5"
   },
-  "homepage": "https://github.com/gptlabs/yield-stream"
+  "homepage": "https://github.com/gptlabs/yield-stream",
+  "dependencies": {
+    "shim-streams": "^0.0.2",
+    "web-streams-polyfill": "^3.2.1"
+  }
 }
