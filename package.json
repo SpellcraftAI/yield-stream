@@ -1,6 +1,6 @@
 {
   "name": "yield-stream",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "license": "MIT",
   "type": "module",
   "platform": "node",
@@ -20,7 +20,7 @@
     "dev": "tsmodule dev",
     "docs": "typedoc src",
     "prebuild": "yarn docs",
-    "build": "tsmodule build -b",
+    "build": "tsmodule build",
     "test": "ava",
     "pretest": "yarn build",
     "prepublishOnly": "yarn test",
