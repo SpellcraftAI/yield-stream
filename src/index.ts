@@ -3,6 +3,8 @@ import { GeneratorFn, StreamGenerator } from "./types";
 /**
  * `compose(f, g, h, ...)` returns a generator function `G(data)` that yields
  * all `(f · g · h · ...)(data)`.
+ *
+ * @note Used to compose multiple transforms into a `pipeline`.
  */
 export const compose = <T>(
   ...generators: GeneratorFn<T>[]
@@ -17,7 +19,8 @@ export const compose = <T>(
 };
 
 /**
- * Runs each chunk through all of the given transforms.
+ * Accepts a stream and transforms and returns a stream of the transformed
+ * chunks. Transforms can yield multiple chunks per input chunk.
  */
 export const pipeline = <T>(
   stream: ReadableStream<T>,
@@ -34,7 +37,7 @@ export const pipeline = <T>(
 };
 
 /**
- * Iterates over a stream, yielding each chunk.
+ * Accepts a stream and yields all of its chunks.
  */
 export const yieldStream = async function* <T>(
   stream: ReadableStream<T>,
@@ -56,7 +59,7 @@ export const yieldStream = async function* <T>(
 };
 
 /**
- * Creates a ReadableStream from a generator function.
+ * Accepts a generator function and streams its outputs.
  */
 export const generateStream = <T, TReturn, D>(
   G: StreamGenerator<D, T, TReturn>,
@@ -73,7 +76,7 @@ export const generateStream = <T, TReturn, D>(
 };
 
 /**
- * Creates a ReadableStream that yields all values in an array.
+ * Accepts an array and returns a stream of its items.
  */
 export const streamArray = <T>(array: T[]): ReadableStream<T> => {
   return generateStream(function* () {
@@ -84,8 +87,7 @@ export const streamArray = <T>(array: T[]): ReadableStream<T> => {
 };
 
 /**
- * Generator that accepts a generator `G` and yields an incrementing buffer of
- * chunks.
+ * Accepts a stream and yields a growing buffer of all chunks received.
  */
 export const buffer = async function* <T>(stream: ReadableStream<T>) {
   const buffer: T[] = [];
