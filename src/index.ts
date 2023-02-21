@@ -1,4 +1,3 @@
-// import "shim-streams";
 import { GeneratorFn, StreamGenerator } from "./types";
 
 /**
@@ -7,9 +6,9 @@ import { GeneratorFn, StreamGenerator } from "./types";
  *
  * @note Used to compose multiple transforms into a `pipeline`.
  */
-export const compose = <T>(
-  ...generators: GeneratorFn<T>[]
-): GeneratorFn<T> => {
+export const compose = <Chunk>(
+  ...generators: GeneratorFn<Chunk>[]
+): GeneratorFn<Chunk> => {
   return generators.reduce(
     (prev, next) => async function* (data) {
       for await (const chunk of prev(data)) {
@@ -23,10 +22,10 @@ export const compose = <T>(
  * Accepts a stream and transforms and returns a stream of the transformed
  * chunks. Transforms can yield multiple chunks per input chunk.
  */
-export const pipeline = <T>(
-  stream: ReadableStream<T>,
-  ...transforms: GeneratorFn<T>[]
-): ReadableStream<T> => {
+export const pipeline = <Chunk>(
+  stream: ReadableStream<Chunk>,
+  ...transforms: GeneratorFn<Chunk>[]
+): ReadableStream<Chunk> => {
   const composed = compose(...transforms);
   return generateStream(
     async function* () {
@@ -40,8 +39,8 @@ export const pipeline = <T>(
 /**
  * Accepts a stream and yields all of its chunks.
  */
-export const yieldStream = async function* <T>(
-  stream: ReadableStream<T>,
+export const yieldStream = async function* <Chunk>(
+  stream: ReadableStream<Chunk>,
   controller?: AbortController
 ) {
   const reader = stream.getReader();
@@ -62,11 +61,11 @@ export const yieldStream = async function* <T>(
 /**
  * Accepts a generator function and streams its outputs.
  */
-export const generateStream = <T, TReturn, D>(
-  G: StreamGenerator<D, T, TReturn>,
-  data?: D
-): ReadableStream<T> => {
-  return new ReadableStream<T>({
+export const generateStream = <Chunk, Return, Data>(
+  G: StreamGenerator<Data, Chunk, Return>,
+  data?: Data
+): ReadableStream<Chunk> => {
+  return new ReadableStream<Chunk>({
     async start(controller) {
       for await (const chunk of G(data)) {
         controller.enqueue(chunk);
@@ -79,7 +78,9 @@ export const generateStream = <T, TReturn, D>(
 /**
  * Accepts an array and returns a stream of its items.
  */
-export const streamArray = <T>(array: T[]): ReadableStream<T> => {
+export const streamArray = <Chunk>(
+  array: Chunk[]
+): ReadableStream<Chunk> => {
   return generateStream(function* () {
     for (const item of array) {
       yield item;
@@ -90,8 +91,10 @@ export const streamArray = <T>(array: T[]): ReadableStream<T> => {
 /**
  * Accepts a stream and yields a growing buffer of all chunks received.
  */
-export const buffer = async function* <T>(stream: ReadableStream<T>) {
-  const buffer: T[] = [];
+export const buffer = async function* <Chunk>(
+  stream: ReadableStream<Chunk>
+) {
+  const buffer: Chunk[] = [];
 
   for await (const chunk of yieldStream(stream)) {
     buffer.push(chunk);
