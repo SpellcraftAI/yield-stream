@@ -9,10 +9,13 @@
   },
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "node.d.ts",
+    "node.js"
   ],
   "exports": {
     "./package.json": "./package.json",
+    "./node": "./node.js",
     ".": "./dist/index.js",
     "./*": "./dist/*/index.js"
   },

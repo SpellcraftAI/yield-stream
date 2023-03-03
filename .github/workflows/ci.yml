@@ -16,8 +16,8 @@ jobs:
     strategy:
       matrix:
         nodejs: [
-          # 14, 
-          # 16,
+          14, 
+          16,
           18,
           # "lts/*"
         ]

@@ -1,21 +1,21 @@
-import { GeneratorFn, StreamGenerator } from "./types";
+import { GeneratorFn, StreamGenerator } from "../types";
+import { compose, generateArray } from "./shared";
 
 /**
- * `compose(f, g, h, ...)` returns a generator function `G(data)` that yields
- * all `(f · g · h · ...)(data)`.
- *
- * @note Used to compose multiple transforms into a `pipeline`.
+ * Accepts a generator function and streams its outputs.
  */
-export const compose = <Chunk>(
-  ...generators: GeneratorFn<Chunk>[]
-): GeneratorFn<Chunk> => {
-  return generators.reduce(
-    (prev, next) => async function* (data) {
-      for await (const chunk of prev(data)) {
-        yield* next(chunk);
+export const generateStream = <Chunk, Return, Data>(
+  G: StreamGenerator<Data, Chunk, Return>,
+  data?: Data
+): ReadableStream<Chunk> => {
+  return new ReadableStream<Chunk>({
+    async start(controller) {
+      for await (const chunk of G(data)) {
+        controller.enqueue(chunk);
       }
+      controller.close();
     },
-  );
+  });
 };
 
 /**
@@ -34,6 +34,15 @@ export const pipeline = <Chunk>(
       }
     }
   );
+};
+
+/**
+ * Accepts an array and returns a stream of its items.
+ */
+export const streamArray = <Chunk>(
+  array: Chunk[]
+): ReadableStream<Chunk> => {
+  return generateStream(generateArray(array));
 };
 
 /**
@@ -56,36 +65,6 @@ export const yieldStream = async function* <Chunk>(
 
     yield value;
   }
-};
-
-/**
- * Accepts a generator function and streams its outputs.
- */
-export const generateStream = <Chunk, Return, Data>(
-  G: StreamGenerator<Data, Chunk, Return>,
-  data?: Data
-): ReadableStream<Chunk> => {
-  return new ReadableStream<Chunk>({
-    async start(controller) {
-      for await (const chunk of G(data)) {
-        controller.enqueue(chunk);
-      }
-      controller.close();
-    },
-  });
-};
-
-/**
- * Accepts an array and returns a stream of its items.
- */
-export const streamArray = <Chunk>(
-  array: Chunk[]
-): ReadableStream<Chunk> => {
-  return generateStream(function* () {
-    for (const item of array) {
-      yield item;
-    }
-  });
 };
 
 /**
