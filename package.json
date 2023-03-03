@@ -24,8 +24,8 @@
     "docs": "typedoc src",
     "prebuild": "yarn docs",
     "build": "tsmodule build",
-    "test": "ava",
-    "pretest": "yarn build",
+    "pretest": "npm pack --pack-destination test",
+    "test": "yarn build && ava",
     "prepare": "yarn --cwd test",
     "prepublishOnly": "yarn test",
     "lint": "eslint src --fix"

@@ -4,6 +4,6 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "yield-stream": "./yield-stream-2.3.0.tgz"
+    "yield-stream": "./yield-stream-3.0.0.tgz"
   }
 }
