@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import test from "ava";
-const NODE_MAJOR_VERSION = Number(process.versions.node.split(".")[0]);
 
-const EdgeModule = await import("../src/platforms/edge");
-const NodeModule = await import("../src/platforms/node");
+const NODE_MAJOR_VERSION = Number(process.versions.node.split(".")[0]);
+const EdgeModule = await import("yield-stream");
+const NodeModule = await import("yield-stream/node");
 
 const variants = {
   edge: EdgeModule,

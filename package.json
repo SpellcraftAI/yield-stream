@@ -1,6 +1,6 @@
 {
   "name": "yield-stream",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "license": "MIT",
   "type": "module",
   "platform": "node",
@@ -26,6 +26,7 @@
     "build": "tsmodule build",
     "test": "ava",
     "pretest": "yarn build",
+    "prepare": "yarn --cwd test",
     "prepublishOnly": "yarn test",
     "lint": "eslint src --fix"
   },
