@@ -1,6 +1,6 @@
 {
   "name": "yield-stream",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "license": "MIT",
   "type": "module",
   "platform": "node",
