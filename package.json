@@ -30,7 +30,7 @@
   "scripts": {
     "dev": "tsmodule dev",
     "export-docs": "typedoc src",
-    "export": "tsmodule build && pnpm export-docs",
+    "build": "tsmodule build && pnpm export-docs",
     "cjs": "tsmodule build -b -f cjs",
     "pretest": "npm pack --pack-destination test",
     "test": "ava",
