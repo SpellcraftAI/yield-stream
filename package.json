@@ -9,25 +9,33 @@
   },
   "types": "dist/index.d.ts",
   "files": [
-    "dist",
-    "node.d.ts",
-    "node.js"
+    "./dist",
+    "./node.*"
   ],
   "exports": {
     "./package.json": "./package.json",
-    "./node": "./node.js",
-    ".": "./dist/index.js",
-    "./*": "./dist/*/index.js"
+    "./node": {
+      "import": "./node.js",
+      "require": "./node.cjs"
+    },
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./*": {
+      "import": "./dist/*/index.js",
+      "require": "./dist/*/index.cjs"
+    }
   },
   "scripts": {
     "dev": "tsmodule dev",
-    "docs": "typedoc src",
-    "prebuild": "yarn docs",
-    "build": "tsmodule build",
+    "export-docs": "typedoc src",
+    "export": "tsmodule build && pnpm export-docs",
+    "cjs": "tsmodule build -b -f cjs",
     "pretest": "npm pack --pack-destination test",
-    "test": "yarn build && ava",
-    "prepare": "yarn --cwd test",
-    "prepublishOnly": "yarn test",
+    "test": "ava",
+    "prepare": "pnpm -C test i",
+    "prepublishOnly": "pnpm test",
     "lint": "eslint src --fix"
   },
   "devDependencies": {
